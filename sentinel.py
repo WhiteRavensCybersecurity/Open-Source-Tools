@@ -7,12 +7,19 @@ import time
 # Configuration
 BASELINE_FILE = "sentinel_baseline.json"
 
+def print_banner():
+    """Prints the tool banner and branding."""
+    print("\n" + "="*50)
+    print(" " * 12 + "SENTINELHASH MONITOR")
+    print(" " * 9 + "Made by White Ravens Cybersecurity")
+    print("="*50 + "\n")
+
 def calculate_file_hash(filepath):
     """Calculates the SHA-256 hash of a file."""
     sha256_hash = hashlib.sha256()
     try:
         with open(filepath, "rb") as f:
-            # Read the file in chunks to avoid using too much RAM for large files
+            # Read the file in chunks to avoid using too much RAM
             for byte_block in iter(lambda: f.read(4096), b""):
                 sha256_hash.update(byte_block)
         return sha256_hash.hexdigest()
@@ -27,10 +34,9 @@ def scan_directory(directory):
     for root, dirs, files in os.walk(directory):
         for file in files:
             filepath = os.path.join(root, file)
-            # Skip the baseline file itself if it's in the same directory
             if BASELINE_FILE in filepath:
                 continue
-                
+            
             file_hash = calculate_file_hash(filepath)
             if file_hash:
                 files_state[filepath] = file_hash
@@ -57,7 +63,7 @@ def monitor_integrity(directory):
 
     current_state = scan_directory(directory)
     
-    print("\n--- INTEGRITY REPORT ---")
+    print("\n--- WHITE RAVENS INTEGRITY REPORT ---")
     changes_detected = False
 
     # Check for modified or deleted files
@@ -81,6 +87,8 @@ def monitor_integrity(directory):
         print("\n[WARNING] Integrity deviations detected!")
 
 def main():
+    print_banner()
+    
     if len(sys.argv) < 3:
         print("Usage: python sentinel.py <mode> <directory_to_watch>")
         print("Modes: \n  init    -> Create a new baseline\n  check   -> Check for changes")
